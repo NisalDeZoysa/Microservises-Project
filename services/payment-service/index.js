@@ -6,7 +6,7 @@ const app = express();
 app.use(cors({ origin: "http://localhost:3000" }));
 
 const kafka = new Kafka({
-  clientId: "kafka-service",
+  clientId: "payment-service",
   brokers: ["localhost:9094"],
 });
 
@@ -29,7 +29,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).send(err.message);
 });
 
-app.post("/payment-service ", async (req, res) => {
+app.post("/payment-service", async (req, res) => {
   const { cart } = req.body;
   //Assume we get the ccookie and decrypt the user id
 
