@@ -11,6 +11,7 @@ const consumer = kafka.consumer({ groupId: "order-service" });
 const run = async () => {
   try {
     await consumer.connect();
+    await producer.connect();
     await consumer.subscribe({
       topic: "payment-successful",
       fromBeginning: true,
@@ -21,8 +22,14 @@ const run = async () => {
         const { userId, cart } = JSON.parse(message.value.toString());
 
         // TODO : create order in DB
-        const dummyOrderId = Math.floor(Math.random() * 10000);
-        console.log("Order Consumer creating order for user:", userId);
+        const dummyOrderId = Math.floor(Math.random() * 100);
+        //console.log("Order Consumer creating orderId for user:", userId);
+        console.log(
+          "Order consumer for orderID :",
+          dummyOrderId,
+          "for user:",
+          userId
+        );
 
         await producer.send({
           topic: "order-successful",

@@ -33,10 +33,10 @@ app.post("/payment-service", async (req, res) => {
   const { cart } = req.body;
   //Assume we get the ccookie and decrypt the user id
 
-  const userId = "12345"; // Placeholder for user ID extraction logic
+  const userId = Math.floor(Math.random() * 10000); // Placeholder for user ID extraction logic
 
   //TODO: Payment
-  console.log("Api called for payment processing");
+  console.log("Api called for payment processing for user :", userId);
   //KAFKA
   await producer.send({
     topic: "payment-successful",

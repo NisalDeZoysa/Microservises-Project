@@ -11,8 +11,9 @@ const consumer = kafka.consumer({ groupId: "email-service" });
 const run = async () => {
   try {
     await consumer.connect();
+    await producer.connect();
     await consumer.subscribe({
-      topic: ["email-successful", "order-successful", "payment-successful"],
+      topic: "order-successful",
       fromBeginning: true,
     });
 
@@ -22,12 +23,17 @@ const run = async () => {
 
         // TODO : send email to the user
         const dummyEmailId = Math.floor(Math.random() * 10000);
-        console.log("Email consumer sending email for order:");
+        console.log(
+          "Email Consumer sending email for user:",
+          userId,
+          "with order ID:",
+          orderId
+        );
 
         await producer.send({
           topic: "email-successful",
           messages: [
-            { value: JSON.stringify({ userId, email: dummyEmailId }) },
+            { value: JSON.stringify({ userId, emailId: dummyEmailId }) },
           ],
         });
       },
