@@ -1,58 +1,100 @@
 import express from "express";
 import cors from "cors";
-import { Kafka } from "kafkajs";
+import { Kafka, Partitioners } from "kafkajs";
 
 const app = express();
-app.use(cors({ origin: "http://localhost:3000" }));
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
+app.use(express.json());
 
 const kafka = new Kafka({
   clientId: "payment-service",
   brokers: ["localhost:9094"],
 });
 
-const producer = kafka.producer();
+const producer = kafka.producer({
+  createPartitioner: Partitioners.LegacyPartitioner,
+});
 
 const connectToKafka = async () => {
   try {
     await producer.connect();
-    console.log("Connected to Kafka successfully -- producer connected");
-
-    // You can add additional setup here, like creating topics if needed
-  } catch (error) {
-    console.error("Error connecting to Kafka:", error);
+    console.log("✅ Kafka Producer connected successfully!");
+    return true;
+  } catch (err) {
+    console.log("❌ Error connecting to Kafka:", err.message);
+    return false;
   }
 };
 
-app.use(express.json());
+app.post("/payment-service", async (req, res) => {
+  try {
+    const { cart } = req.body;
+    const userId = Math.floor(Math.random() * 100);
+    console.log("🔄 Processing payment for userId:", userId);
 
-app.use((err, req, res, next) => {
-  res.status(err.status || 500).send(err.message);
+    // TODO: PAYMENT PROCESSING
+
+    // KAFKA - Send message to payment-successful topic
+    try {
+      console.log("📤 Attempting to send Kafka message...");
+      const kafkaMessage = {
+        userId,
+        cart,
+        timestamp: new Date().toISOString(),
+      };
+
+      await producer.send({
+        topic: "payment-successful",
+        messages: [
+          {
+            key: userId.toString(),
+            value: JSON.stringify(kafkaMessage),
+          },
+        ],
+      });
+
+      console.log(
+        "✅ Kafka message sent successfully to 'payment-successful' topic:",
+        kafkaMessage
+      );
+    } catch (kafkaError) {
+      console.error("❌ Kafka message failed:", kafkaError.message);
+      // Don't fail the payment if Kafka fails
+    }
+
+    // Use Promise-based timeout instead of callback
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    console.log("💰 Payment completed for userId:", userId);
+    return res.status(200).json({
+      message: "Payment successful",
+      userId,
+      cart,
+    });
+  } catch (error) {
+    console.error("❌ Payment processing error:", error);
+    return res.status(500).json({
+      error: "Payment failed",
+      message: error.message,
+    });
+  }
 });
 
-app.post("/payment-service", async (req, res) => {
-  const { cart } = req.body;
-  //Assume we get the ccookie and decrypt the user id
-
-  const userId = Math.floor(Math.random() * 10000); // Placeholder for user ID extraction logic
-
-  //TODO: Payment
-  console.log("Api called for payment processing for user :", userId);
-  //KAFKA
-  await producer.send({
-    topic: "payment-successful",
-    messages: [{ value: JSON.stringify({ userId, cart }) }],
-  });
-
-  return res.status(200).json({
-    message: "Payment processed successfully",
-    userId: userId,
-    cart: cart,
+app.use((err, req, res, next) => {
+  console.error("Global error handler:", err);
+  res.status(err.status || 500).json({
+    error: err.message || "Internal server error",
   });
 });
 
 app.listen(8000, () => {
-  connectToKafka().catch((error) => {
-    console.error("Failed to connect to Kafka:", error);
-  });
+  connectToKafka();
   console.log("Payment service is running on port 8000");
 });
+
+export default app;
