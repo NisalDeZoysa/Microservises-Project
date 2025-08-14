@@ -1,12 +1,10 @@
-//
-
 // index.js
 import { Kafka } from "kafkajs";
 import mongoose from "mongoose";
 
 // ===== MongoDB Connection =====
 const MONGO_URI =
-  "mongodb+srv://nisalms:qwer1234tyui@cluster0.7xepb85.mongodb.net/orders?retryWrites=true&w=majority&appName=Cluster0";
+  "mongodb+srv://nisalmicro:micro1234@microcluster.w872zhn.mongodb.net/?retryWrites=true&w=majority&appName=microcluster";
 
 mongoose
   .connect(MONGO_URI)
@@ -60,7 +58,12 @@ const run = async () => {
         await producer.send({
           topic: "order-successful",
           messages: [
-            { value: JSON.stringify({ userId, orderId: dummyOrderId }) },
+            {
+              value: JSON.stringify({
+                userId,
+                orderId: dummyOrderId,
+              }),
+            },
           ],
         });
 

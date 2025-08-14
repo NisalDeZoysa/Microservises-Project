@@ -1,4 +1,52 @@
+// import { Kafka } from "kafkajs";
+
+// const kafka = new Kafka({
+//   clientId: "email-service",
+//   brokers: ["localhost:9094"],
+// });
+
+// const producer = kafka.producer();
+// const consumer = kafka.consumer({ groupId: "email-service" });
+
+// const run = async () => {
+//   try {
+//     await consumer.connect();
+//     await producer.connect();
+//     await consumer.subscribe({
+//       topic: "order-successful",
+//       fromBeginning: true,
+//     });
+
+//     await consumer.run({
+//       eachMessage: async ({ topic, partition, message }) => {
+//         const { userId, orderId } = JSON.parse(message.value.toString());
+
+//         // TODO : send email to the user
+//         const dummyEmailId = Math.floor(Math.random() * 10000);
+//         console.log(
+//           "Email Consumer sending email for user:",
+//           userId,
+//           "with order ID:",
+//           orderId
+//         );
+
+//         await producer.send({
+//           topic: "email-successful",
+//           messages: [
+//             { value: JSON.stringify({ userId, emailId: dummyEmailId }) },
+//           ],
+//         });
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error connecting to Kafka:", error);
+//   }
+// };
+
+// run().catch(console.error);
+
 import { Kafka } from "kafkajs";
+import nodemailer from "nodemailer";
 
 const kafka = new Kafka({
   clientId: "email-service",
@@ -7,6 +55,15 @@ const kafka = new Kafka({
 
 const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: "email-service" });
+
+// Configure transporter (example with Gmail SMTP)
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "nisalzoysa2001@gmail.com", // Replace with your Gmail
+    pass: "dvwe axbp djfi lvxn", // Use App Password (not your Gmail password)
+  },
+});
 
 const run = async () => {
   try {
@@ -21,21 +78,28 @@ const run = async () => {
       eachMessage: async ({ topic, partition, message }) => {
         const { userId, orderId } = JSON.parse(message.value.toString());
 
-        // TODO : send email to the user
-        const dummyEmailId = Math.floor(Math.random() * 10000);
-        console.log(
-          "Email Consumer sending email for user:",
-          userId,
-          "with order ID:",
-          orderId
-        );
+        // Send email
+        const mailOptions = {
+          from: "nisalzoysa2001@gmail.com",
+          to: "nisalchandirade@gmail.com",
+          subject: `Order Confirmation - ${orderId}`,
+          text: `Hello User ${userId}, your order with ID ${orderId} has been successfully placed!`,
+        };
 
-        await producer.send({
-          topic: "email-successful",
-          messages: [
-            { value: JSON.stringify({ userId, emailId: dummyEmailId }) },
-          ],
-        });
+        try {
+          const info = await transporter.sendMail(mailOptions);
+          console.log("✅ Email sent:", info.messageId);
+
+          // Send Kafka message after success
+          await producer.send({
+            topic: "email-successful",
+            messages: [
+              { value: JSON.stringify({ userId, emailId: info.messageId }) },
+            ],
+          });
+        } catch (err) {
+          console.error("❌ Failed to send email:", err);
+        }
       },
     });
   } catch (error) {

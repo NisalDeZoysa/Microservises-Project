@@ -3,32 +3,36 @@ import { Minus } from "lucide-react";
 import Image from "next/image";
 
 const Page = () => {
+  const user =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user") || "{}")
+      : {};
+  const username = user?.username || "Guest";
+
   const cart = [
     {
       id: 1,
       name: "Nike Air Max",
       price: 129.9,
       image: "/product1.png",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+      description: "...",
     },
     {
       id: 2,
       name: "Adidas Superstar Cap",
       price: 29.9,
       image: "/product2.png",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+      description: "...",
     },
     {
       id: 3,
       name: "Puma Yellow T-Shirt",
       price: 49.9,
       image: "/product3.png",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+      description: "...",
     },
   ];
+
   return (
     <div className="mb-16">
       <h1 className="text-2xl font-bold">Cart Products</h1>
@@ -61,7 +65,8 @@ const Page = () => {
           ))}
         </div>
         <div className="w-full lg:w-1/3">
-          <Pay cart={cart} />
+          {/* Pass username to Pay component */}
+          <Pay cart={cart} username={username} />
         </div>
       </div>
     </div>

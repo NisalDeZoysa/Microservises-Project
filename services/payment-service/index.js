@@ -33,7 +33,7 @@ const connectToKafka = async () => {
 
 app.post("/payment-service", async (req, res) => {
   try {
-    const { cart } = req.body;
+    const { cart, username } = req.body;
     const userId = Math.floor(Math.random() * 100);
     console.log("🔄 Processing payment for userId:", userId);
 
@@ -44,6 +44,7 @@ app.post("/payment-service", async (req, res) => {
       console.log("📤 Attempting to send Kafka message...");
       const kafkaMessage = {
         userId,
+        username,
         cart,
         timestamp: new Date().toISOString(),
       };
