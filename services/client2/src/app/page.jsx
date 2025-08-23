@@ -25,21 +25,21 @@ export default function LandingPage() {
             >
               Get Started
             </Link>
-            <Link
+            {/* <Link
               href="/dashboard"
               className="px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-gray-200 transition duration-300"
             >
               Explore
-            </Link>
+            </Link> */}
           </div>
         </div>
 
-        <div className="md:w-1/2 mt-10 md:mt-0">
+        <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center">
           <Image
             src={Logo}
             alt="Shopping"
-            width={500}
-            height={500}
+            width={300}
+            height={300}
             priority
             className="rounded-xl shadow-lg"
           />
