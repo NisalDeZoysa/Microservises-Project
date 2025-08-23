@@ -124,13 +124,26 @@ export default function Home() {
 
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}
 
-        <div className="mt-4 text-center text-sm text-gray-600">
+        {/* <div className="mt-4 text-center text-sm text-gray-600">
           <a href="#" className="text-red-500 hover:underline">
             Forgot password?
           </a>
           <p className="mt-2">
             Don’t have an account?{" "}
             <a href="#" className="text-red-500 hover:underline">
+              Sign up
+            </a>
+          </p>
+        </div> */}
+
+        <div className="mt-4 text-center text-sm text-gray-600">
+          {/* Use a real route if available */}
+          <a href="/forgot-password" className="text-red-500 hover:underline">
+            Forgot password?
+          </a>
+          <p className="mt-2">
+            Don&apos;t have an account?{" "}
+            <a href="/signup" className="text-red-500 hover:underline">
               Sign up
             </a>
           </p>
