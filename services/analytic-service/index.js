@@ -55,10 +55,14 @@
 
 // run().catch(console.error);
 
+
+import cors from "cors";
 import express from "express";
 import { Kafka } from "kafkajs";
 
 const app = express();
+app.use(cors({ origin: "http://localhost:3000" }));
+app.use(express.json());
 const PORT = 8000;
 
 const kafka = new Kafka({
@@ -70,9 +74,9 @@ const consumer = kafka.consumer({ groupId: "analytic-service" });
 
 // Stats and recent events storage
 let totals = {
-  payments: 0,
-  orders: 0,
-  emails: 0,
+  payments: 150,
+  orders: 80,
+  emails: 15,
 };
 
 const MAX_RECENT = 10;

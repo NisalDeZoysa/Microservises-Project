@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   FaShoppingCart,
   FaDollarSign,
   FaUsers,
-  FaBoxOpen,
 } from "react-icons/fa";
 import {
   LineChart,
@@ -16,7 +16,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
 const salesData = [
   { name: "Jan", sales: 4000 },
   { name: "Feb", sales: 3000 },
@@ -25,15 +24,51 @@ const salesData = [
   { name: "May", sales: 5890 },
   { name: "Jun", sales: 4390 },
 ];
-
 export default function AdminDashboard() {
   const router = useRouter();
 
+  // 🔹 State for backend data
+  const [summary, setSummary] = useState({
+    totalPayments: 0,
+    totalOrders: 0,
+    totalEmails: 0,
+  });
+  const [recentPayments, setRecentPayments] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [recentEmails, setRecentEmails] = useState([]);
+
+  // Fetch backend data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [summaryRes, paymentsRes, ordersRes, emailsRes] =
+          await Promise.all([
+            fetch("http://localhost:8000/dashboard/summary"),
+            fetch("http://localhost:8000/dashboard/recent-payments"),
+            fetch("http://localhost:8000/dashboard/recent-orders"),
+            fetch("http://localhost:8000/dashboard/recent-emails"),
+          ]);
+
+        setSummary(await summaryRes.json());
+        setRecentPayments(await paymentsRes.json());
+        setRecentOrders(await ordersRes.json());
+        setRecentEmails(await emailsRes.json());
+      } catch (err) {
+        console.error("Error fetching analytics:", err);
+      }
+    };
+
+    fetchData();
+
+    // Optional: Refresh every 5s
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleLogout = () => {
-  // Example: Clear auth data
-  localStorage.removeItem("token");
-  router.push("/"); // Redirect to login page
-};
+    localStorage.removeItem("token");
+    router.push("/"); // Redirect to login page
+  };
 
   return (
     <div className="flex flex-col justify-center p-6 bg-gray-50 min-h-screen">
@@ -48,30 +83,59 @@ export default function AdminDashboard() {
       </div>
 
       {/* Top Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard
           title="Orders"
-          value="1,245"
+          value={summary.totalOrders}
           icon={<FaShoppingCart className="text-blue-500 text-3xl" />}
         />
         <StatCard
-          title="Revenue"
-          value="$58,245"
+          title="Payments"
+          value={summary.totalPayments}
           icon={<FaDollarSign className="text-green-500 text-3xl" />}
         />
         <StatCard
-          title="Customers"
-          value="845"
+          title="Emails"
+          value={summary.totalEmails}
           icon={<FaUsers className="text-purple-500 text-3xl" />}
         />
-        <StatCard
+        {/* <StatCard
           title="Products"
-          value="320"
+          value="320" // If you add Kafka for products later, replace here
           icon={<FaBoxOpen className="text-orange-500 text-3xl" />}
+        /> */}
+      </div>
+
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <RecentList
+          title="Recent Orders"
+          data={recentOrders}
+          renderItem={(o) => (
+            <li key={o.userId + o.orderId}>
+              📦 User {o.userId} placed order {o.orderId}
+            </li>
+          )}
+        />
+        <RecentList
+          title="Recent Payments"
+          data={recentPayments}
+          renderItem={(p) => (
+            <li key={p.userId + p.total}>
+              💳 User {p.userId} paid ${p.total}
+            </li>
+          )}
+        />
+        <RecentList
+          title="Recent Emails"
+          data={recentEmails}
+          renderItem={(e) => (
+            <li key={e.userId + e.emailId}>✉️ Email sent to user {e.userId}</li>
+          )}
         />
       </div>
 
-      {/* Sales Chart */}
+      {/* Sales Chart - (static for now, you can map to payments later) */}
       <div className="bg-white rounded-lg shadow p-6 mt-6">
         <h2 className="text-xl font-semibold mb-4">Sales Overview</h2>
         <ResponsiveContainer width="100%" height={300}>
@@ -101,6 +165,17 @@ function StatCard({ title, value, icon }) {
         <p className="text-gray-500 text-sm">{title}</p>
         <h3 className="text-xl font-bold">{value}</h3>
       </div>
+    </div>
+  );
+}
+
+function RecentList({ title, data, renderItem }) {
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-lg font-semibold mb-4">{title}</h2>
+      <ul className="space-y-2 text-gray-700 text-sm">
+        {data.length > 0 ? data.map(renderItem) : <li>No records yet</li>}
+      </ul>
     </div>
   );
 }
