@@ -3,6 +3,7 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function Home() {
   const [username, setUsername] = useState("");
@@ -30,13 +31,17 @@ export default function Home() {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
+      toast.success(`✅ Welcome back, ${user.username}!`);
+
       if (user.role == "admin") {
         router.push("/admin");
       } else {
         router.push("/dashboard");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      const msg = err.response?.data?.message || "Login failed";
+      setError(msg);
+      toast.error(`❌ ${msg}`);
     } finally {
       setLoading(false);
     }
@@ -111,7 +116,7 @@ export default function Home() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
