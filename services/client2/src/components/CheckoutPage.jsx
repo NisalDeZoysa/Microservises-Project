@@ -89,7 +89,7 @@ const CheckoutPage = () => {
           <div className="bg-white shadow rounded-2xl p-5">
             <h2 className="text-lg font-semibold mb-3">Shipping method</h2>
             <p className="text-gray-700">
-              Shipping: <span className="font-semibold">LKR672.99</span>
+              Shipping: <span className="font-semibold">Free Shipping</span>
             </p>
             <p className="text-gray-500 text-sm">Delivery: Aug. 29 - Sep. 20</p>
           </div>
