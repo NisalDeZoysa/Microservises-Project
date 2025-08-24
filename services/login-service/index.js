@@ -4,7 +4,7 @@ import { Kafka } from "kafkajs";
 import jwt from "jsonwebtoken";
 
 const app = express();
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: ["http://localhost:3000", "http://localhost:3001"] }));
 app.use(express.json());
 
 // Kafka setup
@@ -16,6 +16,11 @@ const producer = kafka.producer();
 
 // JWT secret key
 const SECRET_KEY = "supersecretkey"; // In real apps, store in process.env
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "healthy", service: "login-service" });
+});
 
 // Temporary in-memory users (no DB for now)
 const users = [
@@ -67,7 +72,7 @@ app.post("/login", async (req, res) => {
 });
 
 // Start server
-app.listen(7000, async () => {
+app.listen(7001, async () => {
   await producer.connect(); // Connect Kafka at startup
-  console.log("✅ Login service running on port 7000");
+  console.log("✅ Login service running on port 7001");
 });
