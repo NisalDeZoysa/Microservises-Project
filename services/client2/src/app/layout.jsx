@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 
-import { CartProvider } from "@/context/CartContext";
+import { CartProvider } from "../context/CartContext";
 
 
 

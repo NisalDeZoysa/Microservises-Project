@@ -1,6 +1,6 @@
 "use client";
 
-import axios from "axios";
+// import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -23,11 +23,11 @@ export default function Signup() {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("http://localhost:7000/signup", {
-        username,
-        password,
-        role,
-      });
+    //   const response = await axios.post("http://localhost:7000/signup", {
+    //     username,
+    //     password,
+    //     role,
+    //   });
 
       toast.success("Signup successful! Please login.");
 
