@@ -3,9 +3,8 @@
 import Image from "next/image";
 import React, { useContext } from "react";
 
-
-import OrderSummary from "@/components/OrderSummary";
-import { CartContext } from "@/context/CartContext";
+import OrderSummary from "../../../components/OrderSummary";
+import { CartContext } from "../../../context/CartContext";
 
 export default function CartPage() {
   const { cart, removeFromCart, clearCart } = useContext(CartContext);
@@ -20,7 +19,7 @@ export default function CartPage() {
             <h1 className="text-3xl font-bold">Your Cart</h1>
             <button
               onClick={clearCart}
-              className="bg-gray-700 text-white px-4 py-2 rounded"
+              className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded cursor-pointer"
             >
               Clear Cart
             </button>

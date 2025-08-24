@@ -1,47 +1,40 @@
 "use client";
 
-import axios from "axios";
+// import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
 
-export default function Home() {
+export default function Signup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username || !password) {
+    if (!username || !password || !role) {
       setError("Please fill in all fields");
       return;
     }
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("http://localhost:7000/login", {
-        username,
-        password,
-      });
-      const { token, user } = response.data;
+    //   const response = await axios.post("http://localhost:7000/signup", {
+    //     username,
+    //     password,
+    //     role,
+    //   });
 
-      // Save auth data
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      toast.success("Signup successful! Please login.");
 
-      toast.success(`✅ Welcome back, ${user.username}!`);
-
-      if (user.role == "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/dashboard");
-      }
+      // Redirect to login after signup
+      router.push("/login");
     } catch (err) {
-      const msg = err.response?.data?.message || "Login failed";
-      // setError(msg);
+      const msg = err.response?.data?.message || "Signup failed";
       toast.error(`❌ ${msg}`);
     } finally {
       setLoading(false);
@@ -53,7 +46,9 @@ export default function Home() {
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
         <div className="text-center">
           <div className="text-4xl font-bold text-black mb-2">🛒 ShopMate</div>
-          <p className="text-gray-500 mb-6">Login to continue shopping</p>
+          <p className="text-gray-500 mb-6">
+            Create an account to start shopping
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,7 +89,7 @@ export default function Home() {
           </div>
 
           {/* Role */}
-          {/* <div>
+          <div>
             <label
               htmlFor="role"
               className="block mb-1 text-gray-700 font-medium"
@@ -112,31 +107,25 @@ export default function Home() {
               <option value="admin">Admin</option>
               <option value="seller">Seller</option>
             </select>
-          </div> */}
+          </div>
 
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
 
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}
 
         <div className="mt-4 text-center text-sm text-gray-600">
-          {/* <a href="#" className="text-red-500 hover:underline">
-            Forgot password?
-          </a> */}
           <p className="mt-2">
-            Don’t have an account?{" "}
-            <Link href="/signup" className="text-red-500 hover:underline">
-              Sign up
+            Already have an account?{" "}
+            <Link href="/login" className="text-red-500 hover:underline">
+              Login
             </Link>
-            {/* <a href="#" className="text-red-500 hover:underline">
-              Sign up
-            </a> */}
           </p>
         </div>
       </div>

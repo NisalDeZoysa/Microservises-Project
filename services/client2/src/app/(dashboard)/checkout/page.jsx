@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import { FaCcVisa, FaCcPaypal, FaGooglePay } from "react-icons/fa";
 
-import Pay from "@/components/Pay";
-import { cart } from "@/constants/Products";
+import Pay from "../../../components/Pay";
+import { cart } from "../../../constants/Products";
 
 const CheckoutPage = () => {
   const [selectedPayment, setSelectedPayment] = useState("");
