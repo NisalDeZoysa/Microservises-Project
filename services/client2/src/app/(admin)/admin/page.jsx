@@ -67,7 +67,7 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    router.push("/"); // Redirect to login page
+    router.push("/login"); // Redirect to login page
   };
 
   return (

@@ -30,6 +30,50 @@ const users = [
   { id: 4, username: "user1", password: "hii@user1", role: "user" },
 ];
 
+// -------------------- SIGNUP --------------------
+app.post("/signup", async (req, res) => {
+  const { username, password, role } = req.body;
+
+  // check if user exists
+  const existingUser = users.find((u) => u.username === username);
+  if (existingUser) {
+    return res.status(400).json({ message: "User already exists" });
+  }
+
+  // create new user
+  const newUser = {
+    id: users.length + 1,
+    username,
+    password,
+    role: role || "user", // default role = user
+  };
+  users.push(newUser);
+
+  // Create JWT token
+  const token = jwt.sign(
+    { id: newUser.id, username: newUser.username, role: newUser.role },
+    SECRET_KEY,
+    { expiresIn: "1h" }
+  );
+
+  // Publish Kafka signup event
+  try {
+    await producer.send({
+      topic: "user-signedup",
+      messages: [{ value: JSON.stringify(newUser) }],
+    });
+    console.log(`📤 user-signedup event sent for user: ${username}`);
+  } catch (err) {
+    console.error("Kafka publish error:", err);
+  }
+
+  res.json({
+    message: "Signup successful",
+    token,
+    user: { id: newUser.id, username: newUser.username, role: newUser.role },
+  });
+});
+
 // Login endpoint
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -74,5 +118,5 @@ app.post("/login", async (req, res) => {
 // Start server
 app.listen(7001, async () => {
   await producer.connect(); // Connect Kafka at startup
-  console.log("✅ Login service running on port 7001");
+  console.log("✅ Auth service (login + signup) running on port 7001");
 });

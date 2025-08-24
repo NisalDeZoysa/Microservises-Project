@@ -1,61 +1,3 @@
-// import { Kafka } from "kafkajs";
-
-// const kafka = new Kafka({
-//   clientId: "analytic-service",
-//   brokers: ["localhost:9094"],
-// });
-
-// const consumer = kafka.consumer({ groupId: "analytic-service" });
-
-// const run = async () => {
-//   try {
-//     await consumer.connect();
-//     await consumer.subscribe({
-//       topics: ["payment-successful", "order-successful", "email-successful"],
-//       fromBeginning: true,
-//     });
-
-//     await consumer.run({
-//       eachMessage: async ({ topic, partition, message }) => {
-//         switch (topic) {
-//           case "payment-successful":
-//             {
-//               const { userId, cart } = JSON.parse(message.value.toString());
-//               const total = cart.reduce((acc, item) => acc + item.price, 0);
-//               console.log(
-//                 `Analytic consumer ${userId} made a payment of $${total}`
-//               );
-//             }
-//             break;
-//           case "order-successful":
-//             {
-//               const { userId, orderId } = JSON.parse(message.value.toString());
-//               console.log(
-//                 `Analytic consumer order created for user ${userId} with order ID ${orderId}`
-//               );
-//             }
-//             break;
-//           case "email-successful":
-//             {
-//               const { userId, emailId } = JSON.parse(message.value.toString());
-//               console.log(
-//                 `Analytic consumer email sent to user ${userId} with email ID ${emailId}`
-//               );
-//             }
-//             break;
-//           default:
-//             console.log(`Unknown topic`);
-//         }
-//       },
-//     });
-//   } catch (error) {
-//     console.error("Error connecting to Kafka:", error);
-//   }
-// };
-
-// run().catch(console.error);
-
-
 import cors from "cors";
 import express from "express";
 import { Kafka } from "kafkajs";
@@ -74,9 +16,9 @@ const consumer = kafka.consumer({ groupId: "analytic-service" });
 
 // Stats and recent events storage
 let totals = {
-  payments: 150,
-  orders: 80,
-  emails: 15,
+  payments: 0,
+  orders: 0,
+  emails: 0,
 };
 
 const MAX_RECENT = 10;
@@ -167,6 +109,11 @@ app.get("/dashboard/recent-emails", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Analytic service running on port ${PORT}`);
+  runKafkaConsumer().catch((err) => {
+    console.error("Error running Kafka consumer:", err);
+  });
+
+  // Run Kafka consumer after the server is up
   runKafkaConsumer().catch((err) => {
     console.error("Error running Kafka consumer:", err);
   });

@@ -1,13 +1,13 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React from "react";
-
+import { toast } from "react-toastify";
 
 const OrderSummary = ({ total }) => {
   const router = useRouter();
 
   const handlePlaceOrder = () => {
-
+    toast.success(`Your order has been placed successfully!`)
     router.push(`/checkout?total=${total}`);
   };
 
@@ -35,13 +35,18 @@ const OrderSummary = ({ total }) => {
       </div>
       <button
         onClick={handlePlaceOrder}
-        className="mt-5 w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-full font-semibold transition"
+        className="mt-5 w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-full font-semibold transition cursor-pointer"
       >
         Place order
       </button>
       <p className="text-xs text-gray-500 mt-2 text-center">
-        <span>Upon clicking &apos;Place Order&apos;, I confirm I have read ...</span>
-        <span className="text-blue-600 cursor-pointer">all terms and policies</span>.
+        <span>
+          Upon clicking &apos;Place Order&apos;, I confirm I have read ...
+        </span>
+        <span className="text-blue-600 cursor-pointer">
+          all terms and policies
+        </span>
+        .
       </p>
     </div>
   );
