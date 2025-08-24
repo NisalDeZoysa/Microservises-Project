@@ -19,8 +19,10 @@ const SECRET_KEY = "supersecretkey"; // In real apps, store in process.env
 
 // Temporary in-memory users (no DB for now)
 const users = [
-  { id: 1, username: "nisal", password: "123456" },
-  { id: 2, username: "alice", password: "password" },
+  { id: 1, username: "nisal", password: "123456", role: "admin" },
+  { id: 2, username: "alice", password: "password", role: "seller" },
+  { id: 3, username: "hiruna", password: "hii@1234", role: "admin" },
+  { id: 4, username: "user1", password: "hii@user1", role: "user" },
 ];
 
 // Login endpoint
@@ -36,9 +38,13 @@ app.post("/login", async (req, res) => {
   }
 
   // Create JWT token
-  const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, {
-    expiresIn: "1h",
-  });
+  const token = jwt.sign(
+    { id: user.id, username: user.username, role: user.role },
+    SECRET_KEY,
+    {
+      expiresIn: "1h",
+    }
+  );
 
   // Publish Kafka event
   try {
@@ -56,7 +62,7 @@ app.post("/login", async (req, res) => {
 
   res.json({
     token,
-    user: { id: user.id, username: user.username },
+    user: { id: user.id, username: user.username, role: user.role },
   });
 });
 
