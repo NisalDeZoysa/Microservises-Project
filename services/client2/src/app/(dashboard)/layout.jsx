@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-[1920px] mx-auto px-16 lg:px-0`}
         >
-          <nav className="flex justify-between items-center py-4 mb-8">
+          <nav className="flex justify-between items-center py-4 mb-8 px-5 shadow-lg">
             <div className="flex items-center gap-4">
               {/* <Image src="/logo.png" alt="logo" width={50} height={50} /> */}
               <Link href="/" className="text-2xl font-black">
