@@ -6,10 +6,15 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://localhost:3001"],
   })
 );
 app.use(express.json());
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "healthy", service: "payment-service" });
+});
 
 const kafka = new Kafka({
   clientId: "payment-service",
@@ -93,9 +98,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(8000, () => {
+app.listen(8001, () => {
   connectToKafka();
-  console.log("Payment service is running on port 8000");
+  console.log("Payment service is running on port 8001");
 });
 
 export default app;
