@@ -3,9 +3,18 @@ import express from "express";
 import { Kafka } from "kafkajs";
 
 const app = express();
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      if (/^http:\/\/localhost:\d+$/.test(origin)) return cb(null, true);
+      return cb(null, false);
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
-const PORT = 8000;
+const PORT = process.env.PORT || 8001;
 
 const kafka = new Kafka({
   clientId: "analytic-service",
@@ -109,11 +118,6 @@ app.get("/dashboard/recent-emails", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Analytic service running on port ${PORT}`);
-  runKafkaConsumer().catch((err) => {
-    console.error("Error running Kafka consumer:", err);
-  });
-
-  // Run Kafka consumer after the server is up
   runKafkaConsumer().catch((err) => {
     console.error("Error running Kafka consumer:", err);
   });

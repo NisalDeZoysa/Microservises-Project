@@ -43,10 +43,10 @@ export default function AdminDashboard() {
       try {
         const [summaryRes, paymentsRes, ordersRes, emailsRes] =
           await Promise.all([
-            fetch("http://localhost:8000/dashboard/summary"),
-            fetch("http://localhost:8000/dashboard/recent-payments"),
-            fetch("http://localhost:8000/dashboard/recent-orders"),
-            fetch("http://localhost:8000/dashboard/recent-emails"),
+            fetch("http://localhost:8001/dashboard/summary"),
+            fetch("http://localhost:8001/dashboard/recent-payments"),
+            fetch("http://localhost:8001/dashboard/recent-orders"),
+            fetch("http://localhost:8001/dashboard/recent-emails"),
           ]);
 
         setSummary(await summaryRes.json());

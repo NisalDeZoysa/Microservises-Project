@@ -22,7 +22,7 @@ export default function Home() {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("http://localhost:7000/login", {
+      const response = await axios.post("http://localhost:7070/login", {
         username,
         password,
       });
