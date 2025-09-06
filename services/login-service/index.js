@@ -21,8 +21,7 @@ const SECRET_KEY = "supersecretkey"; // In real apps, store in process.env
 const users = [
   { id: 1, username: "nisal", password: "123456", role: "admin" },
   { id: 2, username: "alice", password: "password", role: "seller" },
-  { id: 3, username: "hiruna", password: "hii@1234", role: "admin" },
-  { id: 4, username: "user1", password: "hii@user1", role: "user" },
+  { id: 3, username: "user1", password: "hii@user1", role: "user" },
 ];
 
 // -------------------- SIGNUP --------------------

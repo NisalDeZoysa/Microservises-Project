@@ -1,0 +1,103 @@
+version: "3.9"
+services:
+  # ===== Kafka Broker =====
+  kafka:
+    image: bitnami/kafka:latest
+    environment:
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://kafka:9094
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9094:9094"
+    networks:
+      - micro-net
+
+  # ===== Kafka UI =====
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local-cluster
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_READONLY=false
+      - KAFKA_CLUSTERS_0_TOPIC_AUTO_CREATE=true
+    ports:
+      - "9090:8080"
+    depends_on:
+      - kafka
+    networks:
+      - micro-net
+
+  # ===== Login Service =====
+  login-service:
+    build: ./services/login-service
+    ports:
+      - "7000:7000"
+    depends_on:
+      - kafka
+    networks:
+      - micro-net
+
+  # ===== Payment Service =====
+  payment-service:
+    build: ./services/payment-service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - kafka
+    networks:
+      - micro-net
+
+  # ===== Order Service =====
+  order-service:
+    build: ./services/order-service
+    depends_on:
+      - kafka
+    networks:
+      - micro-net
+    environment:
+      - MONGO_URI=mongodb+srv://nisalmicro:micro1234@microcluster.w872zhn.mongodb.net/?retryWrites=true&w=majority&appName=microcluster
+
+  # ===== Email Service =====
+  email-service:
+    build: ./services/email-service
+    depends_on:
+      - kafka
+    networks:
+      - micro-net
+    environment:
+      - EMAIL_USER=nisalzoysa2001@gmail.com
+      - EMAIL_PASS=dvwe axbp djfi lvxn
+
+  # ===== Analytic Service =====
+  analytic-service:
+    build: ./services/analytic-service
+    ports:
+      - "8001:8000"
+    depends_on:
+      - kafka
+    networks:
+      - micro-net
+
+  # ===== Frontend Client =====
+  client:
+    build: ./services/client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - login-service
+      - payment-service
+      - order-service
+      - email-service
+      - analytic-service
+    networks:
+      - micro-net
+
+networks:
+  micro-net:
+    driver: bridge

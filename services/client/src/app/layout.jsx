@@ -1,10 +1,12 @@
 "use client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Image from "next/image";
-import Link from "next/link";
-import { Bell, House, ShoppingCart } from "lucide-react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toastify";
+
+import { CartProvider } from "../context/CartContext";
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,29 +24,24 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <QueryClientProvider client={queryClient}>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-7xl mx-auto px-16 lg:px-0`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-[1920px] mx-auto px-16 lg:px-0`}
         >
-          <nav className="flex justify-between items-center py-4 mb-8">
-            <div className="flex items-center gap-4">
-              <Image src="/logo.png" alt="logo" width={50} height={50} />
-              <Link href="/" className="text-2xl font-black">
-                Lama Shop
-              </Link>
-            </div>
-            <div className="flex items-center gap-6">
-              <House className="w-5 h-5" />
-              <Bell className="w-5 h-5" />
-              <ShoppingCart className="w-5 h-5" />
-              <Image
-                src="/avatar.png"
-                alt="avatar"
-                width={32}
-                height={32}
-                className="rounded-full border border-gray-300"
-              />
-            </div>
-          </nav>
-          {children}
+          <CartProvider>
+            {children}
+            {/* Toast notifications */}
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="colored"
+            />
+          </CartProvider>
         </body>
       </QueryClientProvider>
     </html>
